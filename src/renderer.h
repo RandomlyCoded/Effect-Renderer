@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "PerlinNoise/perlinnoise.h"
+#include "../PerlinNoise/perlinnoise.h"
 
 #include <QElapsedTimer>
 #include <QObject>
