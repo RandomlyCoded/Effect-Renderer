@@ -24,6 +24,11 @@ qt_add_executable(EffectRenderer
     PerlinNoise/perlinnoise.h PerlinNoise/perlinnoise.cpp
 )
 
+
+add_custom_target(Documentation SOURCES
+    ReadMe.md
+)
+
 target_link_libraries(EffectRenderer PRIVATE Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets)
 
 set_target_properties(EffectRenderer PROPERTIES
