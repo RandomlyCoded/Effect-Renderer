@@ -4,5 +4,5 @@ at this point, it is merely an attempt to record anything using QMediaRecorder, 
 
 ## required Libraries
 
-- [Qt](qt.io) Core, Widgets, Multimedia and MultimediaWidgets
+- [Qt](https://qt.io) Core, Widgets, Multimedia and MultimediaWidgets
 - [a perlin noise library](https://github.com/DeiVadder/QNoise) by DeiVadder

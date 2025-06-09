@@ -33,7 +33,7 @@ Recorder::Recorder(QObject *parent)
     , m_session(new QMediaCaptureSession(this))
     , m_recorder(new QMediaRecorder(this))
     , m_output(new QFile("output.mp4", this))
-    , m_renderer(new Renderer(nullptr, this, {1920, 1080}, 10))
+    , m_renderer(new Renderer(nullptr, this, {1920, 1080}, 1200, true, 0, 1000))
 {
     QThread *renderThread = new QThread(this);
 
@@ -41,10 +41,11 @@ Recorder::Recorder(QObject *parent)
     m_output->open(QFile::WriteOnly);
 
     m_recorder->setVideoBitRate(25000_kbps);
+    m_recorder->setAudioBitRate(25000_kbps);
 
     m_recorder->setVideoFrameRate(60);
     m_recorder->setOutputDevice(m_output);
-    // m_recorder->setQuality(QMediaRecorder::VeryHighQuality); // doesn't seem to have any effect
+    m_recorder->setQuality(QMediaRecorder::VeryHighQuality); // doesn't seem to have any effect
     // m_recorder->setEncodingMode(QMediaRecorder::TwoPassEncoding); // seems to not change anything either
 
     QMediaMetaData meta;
@@ -53,7 +54,7 @@ Recorder::Recorder(QObject *parent)
     m_recorder->addMetaData(meta);
 
     QMediaFormat format = m_recorder->mediaFormat();
-    format.setVideoCodec(QMediaFormat::VideoCodec::MPEG4);
+    format.setVideoCodec(QMediaFormat::VideoCodec::Theora);
     m_recorder->setMediaFormat(format);
 
     m_session->setRecorder(m_recorder);
