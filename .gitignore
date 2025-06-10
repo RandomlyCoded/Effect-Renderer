@@ -81,3 +81,7 @@ CMakeLists.txt.user*
 .uic/
 /build*/
 /callgrind/
+
+# performance tests/artifacts by me
+callgrind*
+output*

@@ -33,7 +33,7 @@ Recorder::Recorder(QObject *parent)
     , m_session(new QMediaCaptureSession(this))
     , m_recorder(new QMediaRecorder(this))
     , m_output(new QFile("output.mp4", this))
-    , m_renderer(new Renderer(nullptr, this, {1920, 1080}, 1200, true, 0, 1000))
+    , m_renderer(new Renderer(nullptr, this, {1920, 1080}, 1200, true, 0, 5000))
 {
     QThread *renderThread = new QThread(this);
 

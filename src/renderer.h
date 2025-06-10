@@ -86,7 +86,7 @@ private:
 
     qreal m_z = 0;
 
-    static constexpr qreal scale = 1/1000;
+    static constexpr qreal scale = 0.002;
 
     QPair<QPointF, int> makeParticle();
 

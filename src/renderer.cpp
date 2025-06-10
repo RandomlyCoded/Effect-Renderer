@@ -109,8 +109,7 @@ void Renderer::render()
     QPainter paint;
 
     paint.begin(&img);
-    static const auto clr = QColor(0xffff0000);
-    static const auto hslBg = bg.toHsl();
+    static const auto clr = QColor(0xff700080);
 
     auto pen = QPen();
     pen.setWidth(1);
@@ -179,8 +178,8 @@ void Renderer::updateParticles()
             continue;
         }
 
-        auto noise = m_noise.noise(p.pos().x() * scale, p.pos().y() * scale, m_z) * 2 * M_PI;
-        p.tick(noise, width(), height());
+        auto noise = m_noise.noise(p.pos().x() * scale, p.pos().y() * scale, m_z);
+        p.tick(noise * Particle::pStep, width(), height());
     }
 }
 
@@ -207,8 +206,8 @@ Particle::Particle(QPointF pos, int lifetime)
 void Particle::tick(qreal direction, int w, int h)
 {
     const auto p = pos();
-    auto aX = p.x() + cos(direction) * pStep;
-    auto aY = p.y() + sin(direction) * pStep;
+    auto aX = p.x() + cos(direction);
+    auto aY = p.y() + sin(direction);
 
     if (aX > w)
         aX = 0;
