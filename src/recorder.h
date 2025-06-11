@@ -23,8 +23,8 @@ public:
     void setPreviewOutput(QVideoWidget *widget);
 
     void stop();
-
     void onMediaRecorderStateChanged(QMediaRecorder::RecorderState state);
+    Renderer *renderer() { return m_renderer; }
 
 private:
     QVideoWidget *m_preview = nullptr;
