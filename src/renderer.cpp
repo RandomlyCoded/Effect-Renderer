@@ -38,8 +38,8 @@ int getAgeInOldTrail(int i, int offset, int len)
 inline QPoint clampPositionToImage(QPointF p, int w, int h)
 {
     return {
-        std::clamp(int(p.x()), 0, w - 1),
-        std::clamp(int(p.y()), 0, h - 1)
+        std::min(int(p.x()), w - 1),
+        std::min(int(p.y()), h - 1)
     };
 }
 
@@ -121,7 +121,7 @@ void Renderer::render()
         for (int i = positions.length() - 1; i >= 0; --i) {
             int age = getAgeOfPosition(i, p.lifeTime(), p.initialLifeTime());
 
-            const auto f = age / Particle::queueSizeF;
+            const auto f = age * Particle::queueSizeInv;
             const auto pos = positions.get(i);
 
             const auto imgPos = clampPositionToImage(pos, m_size.width(), m_size.height());
@@ -199,7 +199,7 @@ Queue<T, Size>::Queue(T fill)
 template<typename T, int Size>
 T &Queue<T, Size>::get(int idx)
 {
-    return m_data[(idx + m_step) % Size];
+    return m_data[(idx + m_step) % Size]; // bitwise and didn't seem to give any performance improvements
 }
 
 Particle::Particle(QPointF pos, int lifetime)

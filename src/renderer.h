@@ -35,7 +35,7 @@ public:
     static constexpr qreal pStep = 4 * M_PI;
 
     static constexpr int  queueSize = 128;
-    static constexpr auto queueSizeF = qreal(queueSize);
+    static constexpr auto queueSizeInv = 1./queueSize;
 
     Particle(QPointF pos, int lifetime);
     Particle(QPair<QPointF, int> data) : Particle(data.first, data.second) {}
