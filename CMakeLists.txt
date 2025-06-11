@@ -24,7 +24,6 @@ qt_add_executable(EffectRenderer
     PerlinNoise/perlinnoise.h PerlinNoise/perlinnoise.cpp
 )
 
-
 add_custom_target(Documentation SOURCES
     ReadMe.md
 )
