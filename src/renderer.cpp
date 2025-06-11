@@ -14,6 +14,10 @@ using namespace std::chrono_literals;
 namespace
 {
 
+constexpr int OFFSET_RED   = 2;
+constexpr int OFFSET_GREEN = 1;
+constexpr int OFFSET_BLUE  = 0;
+
 inline qreal lerp(qreal a, qreal b, qreal t)
 {
     return (b - a) * t + a;
@@ -103,18 +107,13 @@ void Renderer::render()
     QImage img(m_size.width(), m_size.height(), QImage::Format::Format_ARGB32);
 
     static const QColor bg(0xff2d2d2d);
+    static const auto particleClr = QColor(0xff700080).toHsl();
 
     img.fill(bg);
 
-    QPainter paint;
-
-    paint.begin(&img);
-    static const auto clr = QColor(0xff700080);
-
-    auto pen = QPen();
-    pen.setWidth(1);
-
-    paint.setPen(pen);
+    // I believe technically a QByteArray would be correct, but using a raw pointer halves rendering time
+    // most likely because the QByteArray spends time checking if it needs to be detached
+    auto imgData = img.bits();
 
     for (auto &p: m_particles) {
         auto positions = p.positions();
@@ -122,28 +121,38 @@ void Renderer::render()
         for (int i = positions.length() - 1; i >= 0; --i) {
             int age = getAgeOfPosition(i, p.lifeTime(), p.initialLifeTime());
 
-            const auto f = (age / qreal(Particle::queueSize));
-            auto hsl = clr.toHsl();
+            const auto f = age / Particle::queueSizeF;
             const auto pos = positions.get(i);
 
-            auto bgClr = img.pixelColor(clampPositionToImage(pos, m_size.width(), m_size.height())).toHsl();
+            const auto imgPos = clampPositionToImage(pos, m_size.width(), m_size.height());
+            const int index0 = (imgPos.x() + imgPos.y() * img.width()) * 4;
 
-            hsl.setHslF(     hsl.hslHueF(),
-                        lerp(hsl.hslSaturationF(), bgClr.hslSaturationF(), f),
-                        lerp(hsl.lightnessF(),     bgClr.lightnessF(),     f));
-            pen.setColor(hsl);
-            paint.setPen(pen);
+            auto bgClr = QColor {
+                uchar(imgData[index0 + OFFSET_RED  ]),
+                uchar(imgData[index0 + OFFSET_GREEN]),
+                uchar(imgData[index0 + OFFSET_BLUE ])
+            }.toHsl();
 
-            paint.drawPoint(pos);
+            const auto clr = QColor::fromHslF(     particleClr.hslHueF(),
+                                              lerp(particleClr.hslSaturationF(), bgClr.hslSaturationF(), f),
+                                              lerp(particleClr.lightnessF(),     bgClr.lightnessF(),     f)
+                             ).toRgb();
+
+            // order is reversed, probably some little/big endian stuff idk
+            imgData[index0 + OFFSET_RED  ] = clr.red();
+            imgData[index0 + OFFSET_GREEN] = clr.green();
+            imgData[index0 + OFFSET_BLUE ] = clr.blue();
         }
     }
 
-    paint.end();
-
     updateParticles();
 
+    img = QImage(imgData, m_size.width(), m_size.height(), QImage::Format_ARGB32);
+
+    img.detach();
+
     // properly init the frame
-    m_vframe = QVideoFrame(img);
+    m_vframe = QVideoFrame(std::move(img));
     m_vframe.setStartTime(frameTime);
     m_vframe.setEndTime(frameTime + frameDelay);
 

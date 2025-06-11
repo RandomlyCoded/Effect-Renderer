@@ -34,7 +34,8 @@ public:
     static constexpr int maxLifetime = 8 * 60; // 8 seconds
     static constexpr qreal pStep = 4 * M_PI;
 
-    static constexpr int queueSize = 128;
+    static constexpr int  queueSize = 128;
+    static constexpr auto queueSizeF = qreal(queueSize);
 
     Particle(QPointF pos, int lifetime);
     Particle(QPair<QPointF, int> data) : Particle(data.first, data.second) {}
