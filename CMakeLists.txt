@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Multimedia MultimediaWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Multimedia MultimediaWidgets)
 
 set(PROJECT_SOURCES
         src/main.cpp
@@ -29,7 +29,7 @@ add_custom_target(Documentation SOURCES
     ReadMe.md
 )
 
-target_link_libraries(EffectRenderer PRIVATE Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets)
+target_link_libraries(EffectRenderer PRIVATE Qt6::Gui Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets)
 
 set_target_properties(EffectRenderer PROPERTIES
     ${BUNDLE_ID_OPTION}
