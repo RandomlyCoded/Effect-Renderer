@@ -19,7 +19,7 @@ public:
 private:
     QVideoWidget *m_video;
 
-    Recorder *m_renderer;
+    Recorder *m_recorder;
 
     // QWidget interface
 protected:

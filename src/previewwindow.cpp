@@ -4,11 +4,11 @@ namespace randomly {
 
 PreviewWindow::PreviewWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m_renderer(new Recorder(this))
+    , m_recorder(new Recorder(this))
     , m_video(new QVideoWidget(this))
 {
     resize(1920, 1080);
-    m_renderer->setPreviewOutput(m_video);
+    m_recorder->setPreviewOutput(m_video);
 
     m_video->show();
 }
