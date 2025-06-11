@@ -147,12 +147,8 @@ void Renderer::render()
 
     updateParticles();
 
-    img = QImage(imgData, m_size.width(), m_size.height(), QImage::Format_ARGB32);
-
-    img.detach();
-
     // properly init the frame
-    m_vframe = QVideoFrame(std::move(img));
+    m_vframe = QVideoFrame(img);
     m_vframe.setStartTime(frameTime);
     m_vframe.setEndTime(frameTime + frameDelay);
 
