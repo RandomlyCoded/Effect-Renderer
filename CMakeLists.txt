@@ -28,6 +28,11 @@ add_custom_target(Documentation SOURCES
     ReadMe.md
 )
 
+target_compile_definitions(EffectRenderer
+    PUBLIC RANDOMLY_EXECUTABLE_NAME="${PROJECT_NAME}"
+    PUBLIC RANDOMLY_VERSION="${PROJECT_VERSION}"
+)
+
 target_link_libraries(EffectRenderer PRIVATE Qt6::Gui Qt6::Widgets Qt6::Multimedia Qt6::MultimediaWidgets)
 
 set_target_properties(EffectRenderer PROPERTIES
