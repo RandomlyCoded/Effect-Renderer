@@ -4,6 +4,7 @@
 #include "recorder.h"
 
 #include <QMainWindow>
+#include <QProgressBar>
 #include <QVideoWidget>
 
 namespace randomly {
@@ -20,10 +21,14 @@ private:
     QVideoWidget *m_video;
 
     Recorder *m_recorder;
+    QProgressBar *m_progress;
+
+    void updateProgress();
 
     // QWidget interface
 protected:
     void resizeEvent(QResizeEvent *event);
+    void closeEvent(QCloseEvent *event);
 };
 
 } // namespace randomly

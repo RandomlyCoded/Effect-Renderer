@@ -65,6 +65,9 @@ public:
     int width()  { return m_size.width();  }
     int height() { return m_size.height(); }
 
+    int framesRendered() { return currentFrame; }
+    int targetFrames() { return framesToRender; }
+
 signals:
     void frameRendered(QVideoFrame &frame);
 
