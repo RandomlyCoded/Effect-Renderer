@@ -2,6 +2,7 @@
 
 #include "renderer.h"
 
+#include <QCommandLineParser>
 #include <QFile>
 #include <QGuiApplication>
 #include <QLoggingCategory>
@@ -18,23 +19,98 @@ namespace randomly {
 namespace
 {
 
+Q_LOGGING_CATEGORY(lcRecorder, "randomly.Recorder");
+
 inline int operator""_kbps(quint64 v)
 {
     return v * 1000;
 }
 
-} // namespace
+inline int tryConvertInt(const QString &v, const char *name)
+{
+    bool ok = true;
 
-Q_LOGGING_CATEGORY(lcRecorder, "randomly.Recorder");
+    const auto i = v.toInt(&ok);
+    if (!ok) {
+        qCWarning(lcRecorder).nospace() << "Invalid integer \"" << name << "\": " << v;
+        exit(1);
+    }
+
+    return i;
+}
+
+QDebug operator<<(QDebug dbg, RenderInfo &info)
+{
+    const QDebugStateSaver saver(dbg);
+    dbg.nospace().noquote();
+
+    return dbg << info.framesToRender << " frames@" << info.size.width() << "x" << info.size.height() << "/" << info.seed << ", " << info.particleCount << "(" << info.saveFrames << ")";
+}
+
+QSize tryParseSize(QString str)
+{
+    if (!str.contains('x')) {
+        qCWarning(lcRecorder) << "Invalid resolution provided! Expected format: <width>x<height>";
+        exit(1);
+    }
+
+    auto dims = str.split('x');
+
+    return {tryConvertInt(dims[0], "width"), tryConvertInt(dims[1], "height")};
+}
+
+} // namespace
 
 Recorder::Recorder(QObject *parent)
     : QObject{parent}
     , m_input(new QVideoFrameInput(this))
     , m_session(new QMediaCaptureSession(this))
     , m_recorder(new QMediaRecorder(this))
-    , m_output(new QFile("output.mp4", this))
-    , m_renderer(new Renderer(nullptr, this, {1920, 1080}, 1200, true, 0, 5000))
 {
+    QCoreApplication::setApplicationName(RANDOMLY_EXECUTABLE_NAME);
+    QCoreApplication::setApplicationVersion(RANDOMLY_VERSION);
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Renderer for an effect by RandomlyCoded");
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption framesOption({"f", "frames"}, "Number of frames to render\t(default: 60).", "count", "60");
+    parser.addOption(framesOption);
+
+    QCommandLineOption resolutionOption({"r", "resolution"}, "Video resolution\t\t(default: 1920x1080).", "width>x<height", "1920x1080");
+    parser.addOption(resolutionOption);
+
+    QCommandLineOption seedOption({"s", "seed"}, "Seed for perlin noise\t(default: 0).", "seed", "0");
+    parser.addOption(seedOption);
+
+    QCommandLineOption particleOption({"p", "particles"}, "Number of particles\t(default: 5000).", "count", "5000");
+    parser.addOption(particleOption);
+
+    QCommandLineOption outputOption({"o", "output"}, "Output file (default: output.mp4).", "file", "output.mp4");
+    parser.addOption(outputOption);
+
+    QCommandLineOption saveFramesOption("save-frames", "Save individual frames to ./data/");
+    parser.addOption(saveFramesOption);
+
+
+    parser.process(QCoreApplication::arguments());
+
+    RenderInfo info;
+
+    info.size = tryParseSize(parser.value(resolutionOption));
+    info.particleCount = tryConvertInt(parser.value(particleOption), "particle count");
+    info.framesToRender = tryConvertInt(parser.value(framesOption), "frame count");
+    info.seed = tryConvertInt(parser.value(seedOption), "seed");
+    info.saveFrames = parser.isSet(saveFramesOption);
+
+    qCInfo(lcRecorder).noquote() << info << "->" << parser.value(outputOption);
+
+    m_output = new QFile(parser.value(outputOption), this);
+
+    // parent = nullptr so I can move the renderer between threads
+    m_renderer = new Renderer(nullptr, this, info);
+
     QThread *renderThread = new QThread(this);
 
     m_renderer->moveToThread(renderThread);

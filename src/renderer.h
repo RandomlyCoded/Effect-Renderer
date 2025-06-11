@@ -54,11 +54,20 @@ private:
     int m_initialLifeTime;
 };
 
+struct RenderInfo
+{
+    QSize size = {1920, 1080};
+    quint64 framesToRender = 60;
+    bool saveFrames = false;
+    uint seed = 0;
+    int particleCount = 5000;
+};
+
 class Renderer : public QObject
 {
     Q_OBJECT
 public:
-    explicit Renderer(QObject *parent = nullptr, Recorder *recorder = nullptr, QSize size = {}, quint64 _framesToRender = 60, bool saveFrames = false, uint seed = 0, int particleCount = 1000);
+    explicit Renderer(QObject *parent = nullptr, Recorder *recorder = nullptr, const RenderInfo &info = {});
 
     void render();
 

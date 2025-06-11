@@ -66,20 +66,20 @@ int getAgeOfPosition(int i, int lifeTime, int initialLifeTime)
 
 Q_LOGGING_CATEGORY(lcRenderer, "randomly.Renderer")
 
-Renderer::Renderer(QObject *parent, Recorder *recorder, QSize size, quint64 _framesToRender, bool saveFrames, uint seed, int particleCount)
+Renderer::Renderer(QObject *parent, Recorder *recorder, const RenderInfo &info)
     : QObject{parent}
-    , m_size(size)
     , m_recorder(recorder)
-    , m_noise(PerlinNoise(seed))
-    , framesToRender(_framesToRender)
-    , m_saveFrames(saveFrames)
-    , m_rng(new QRandomGenerator(seed))
+    , m_size(info.size)
+    , m_noise(PerlinNoise(info.seed))
+    , framesToRender(info.framesToRender)
+    , m_saveFrames(info.saveFrames)
+    , m_rng(new QRandomGenerator(info.seed))
 {
     m_renderTimer.start();
 
-    m_particles.reserve(particleCount);
+    m_particles.reserve(info.particleCount);
 
-    for (int i = 0; i < particleCount; ++i)
+    for (int i = 0; i < info.particleCount; ++i)
         m_particles.emplaceBack(makeParticle());
 
     qCInfo(lcRenderer) << "particles initialized in" << m_renderTimer.elapsed() << "ms";
